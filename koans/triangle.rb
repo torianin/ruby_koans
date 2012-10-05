@@ -14,8 +14,20 @@
 #   about_triangle_project_2.rb
 #
 def triangle(a, b, c)
-  # WRITE THIS CODE
-end
+    raise TriangleError, "Nie mozliwy trojkat" if [a,b,c].min <= 0
+    x, y, z = [a,b,c].sort
+    raise TriangleError, "Dwa boki moga byc mniejsze od 3" if x + y <= z
+
+    if a == b && b == c
+        :equilateral
+    elsif a == b || b == c || c == a
+        :isosceles
+    else
+        :scalene
+    end
+end 
+
+
 
 # Error class used in part 2.  No need to change this code.
 class TriangleError < StandardError
