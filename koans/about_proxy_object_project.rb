@@ -6,7 +6,7 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 # below).  You should be able to initialize the proxy object with any
 # object.  Any messages sent to the proxy object should be forwarded
 # to the target object.  As each message is sent, the proxy should
-# record the name of the method sent.
+# record the name of the method send.
 #
 # The proxy class is started for you.  You will need to add a method
 # missing handler and any other supporting methods.  The specification
@@ -15,10 +15,26 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 class Proxy
   def initialize(target_object)
     @object = target_object
-    # ADD MORE CODE HERE
+    @messages = []
   end
 
-  # WRITE CODE HERE
+  def method_missing(method_name, *args, &block)
+    @messages << method_name
+    @object.send(method_name, *args, &block)
+  end
+
+  def messages
+    @messages
+  end
+
+  def called?(method_symbol)
+    @messages.include? method_symbol
+  end
+
+  def number_of_times_called(method_symbol)
+    found = @messages.find_all {|message| message.eql? method_symbol }
+    found.to_a.length
+  end
 end
 
 # The proxy object should pass the following Koan:
@@ -27,8 +43,6 @@ class AboutProxyObjectProject < EdgeCase::Koan
   def test_proxy_method_returns_wrapped_object
     # NOTE: The Television class is defined below
     tv = Proxy.new(Television.new)
-
-    # HINT: Proxy class is defined above, may need tweaking...
 
     assert tv.instance_of?(Proxy)
   end
@@ -67,7 +81,7 @@ class AboutProxyObjectProject < EdgeCase::Koan
     tv.power
 
     assert tv.called?(:power)
-    assert ! tv.called?(:channel)
+    assert !tv.called?(:channel)
   end
 
   def test_proxy_counts_method_calls
@@ -130,7 +144,7 @@ class TelevisionTest < EdgeCase::Koan
     tv.power
     tv.power
 
-    assert ! tv.on?
+    assert !tv.on?
   end
 
   def test_edge_case_on_off
@@ -144,7 +158,7 @@ class TelevisionTest < EdgeCase::Koan
 
     tv.power
 
-    assert ! tv.on?
+    assert !tv.on?
   end
 
   def test_can_set_the_channel
